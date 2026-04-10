@@ -10,6 +10,8 @@ Zero-dependency pan/zoom image viewer. 25KB.
 
 I built this because I wanted to host high-resolution images without compression destroying them, and couldn't find a viewer that zoomed toward the cursor instead of the center.
 
+**[Live demo](https://dr.eamer.dev/viewer/static/02COlIZ.html)**
+
 ```bash
 npm install zoooom
 ```
@@ -21,14 +23,18 @@ new Zoooom('#container', { src: 'image.jpg' });
 
 ---
 
-## What's different
+## What Makes This Different
 
-- Zoom targets the cursor, not the image center
-- Trackpad vs mouse wheel detection (continuous vs discrete zoom)
-- Pinch center tracking updates each frame
-- Max zoom auto-calculated from the image's native resolution
-- Momentum on pan release
-- No framework, no build step required
+Most image zoom libraries are either:
+1. jQuery plugins from 2014 that zoom to center (not cursor position)
+2. React/Vue wrappers that bring 200KB of framework along
+3. Overkill map engines that want tile servers
+
+`zoooom` is none of those. It's the interaction engine extracted from an accessibility-first image viewer I built to display 165 high-resolution infographics. Battle-tested with mouse, touch, trackpad, keyboard, and even joystick input across Chrome, Firefox, Safari, and mobile.
+
+**Zero dependencies. ~25KB core (before gzip). Works with any image.**
+
+The zoom-toward-cursor math is correct (not the naive "scale from center" that most libs do). Trackpad detection distinguishes precision scrolling from mouse wheel clicks. Safari gesture events are handled. Pinch-to-zoom tracks the actual pinch center, not the image center.
 
 ---
 
@@ -37,7 +43,7 @@ new Zoooom('#container', { src: 'image.jpg' });
 | Method | Action |
 |--------|--------|
 | Mouse drag | Pan |
-| Scroll wheel | Zoom toward cursor |
+| Scroll wheel | Zoom toward cursor (discrete steps) |
 | Trackpad | Continuous zoom toward cursor |
 | Ctrl+wheel | Pinch gesture (Windows/Linux) |
 | Safari gestures | Native gesture zoom |
@@ -125,8 +131,6 @@ Full bundle: `unpkg.com/zoooom/dist/zoooom-full.iife.global.js`
   --zoooom-cursor: grab;
   --zoooom-cursor-active: grabbing;
 }
-
-/* Or: injectStyles: false + your own stylesheet */
 ```
 
 ## Script Tag
