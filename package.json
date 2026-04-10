@@ -1,6 +1,6 @@
 {
   "name": "zoooom",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "ENHANCE! Pan, zoom, and inspect images with mouse, touch, keyboard, and joystick. Zero dependencies.",
   "type": "module",
   "main": "./dist/index.js",
