@@ -16,7 +16,7 @@ export default defineConfig([
     outDir: 'dist',
   },
   {
-    entry: { 'zoooom.iife': 'src/index.ts' },
+    entry: { 'zoooom.iife': 'src/iife-entry.ts' },
     format: ['iife'],
     globalName: 'Zoooom',
     dts: false,
@@ -25,9 +25,10 @@ export default defineConfig([
     treeshake: true,
     target: 'es2020',
     outDir: 'dist',
+    footer: { js: 'Zoooom = Zoooom.default;' },
   },
   {
-    entry: { 'zoooom-full.iife': 'src/full.ts' },
+    entry: { 'zoooom-full.iife': 'src/iife-full-entry.ts' },
     format: ['iife'],
     globalName: 'Zoooom',
     dts: false,
@@ -36,5 +37,6 @@ export default defineConfig([
     treeshake: true,
     target: 'es2020',
     outDir: 'dist',
+    footer: { js: 'var ZoooomJoystick = Zoooom.ZoooomJoystick; Zoooom = Zoooom.default;' },
   },
 ]);
