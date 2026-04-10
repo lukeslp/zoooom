@@ -1,0 +1,66 @@
+{
+  "name": "zoooom",
+  "version": "1.0.0",
+  "description": "ENHANCE! Pan, zoom, and inspect images with mouse, touch, keyboard, and joystick. Zero dependencies.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./joystick": {
+      "types": "./dist/joystick.d.ts",
+      "import": "./dist/joystick.js",
+      "require": "./dist/joystick.cjs"
+    },
+    "./css": "./dist/zoooom.css",
+    "./css/joystick": "./dist/zoooom-joystick.css"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "zoom",
+    "pan",
+    "image-viewer",
+    "pinch-to-zoom",
+    "touch",
+    "accessibility",
+    "a11y",
+    "joystick",
+    "enhance",
+    "vanilla-js",
+    "zero-dependency"
+  ],
+  "author": "Luke Steuber <luke@lukesteuber.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/lukeslp/zoooom",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lukeslp/zoooom.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsup": "^8.0.0",
+    "vitest": "^2.0.0"
+  }
+}
