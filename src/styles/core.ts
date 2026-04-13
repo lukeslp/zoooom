@@ -12,8 +12,6 @@ export const ZOOOOM_CSS = `
   --zoooom-fade-speed: 0.3s;
 
   position: relative;
-  width: 100%;
-  height: 100%;
   background: var(--zoooom-bg);
   overflow: hidden;
   touch-action: none;
