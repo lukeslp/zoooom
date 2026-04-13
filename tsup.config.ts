@@ -25,7 +25,9 @@ export default defineConfig([
     treeshake: true,
     target: 'es2020',
     outDir: 'dist',
-    footer: { js: 'Zoooom = Zoooom.default;' },
+    esbuildOptions(options) {
+      options.footer = { js: 'Zoooom = Zoooom.default || Zoooom;' };
+    },
   },
   {
     entry: { 'zoooom-full.iife': 'src/iife-full-entry.ts' },
@@ -37,6 +39,8 @@ export default defineConfig([
     treeshake: true,
     target: 'es2020',
     outDir: 'dist',
-    footer: { js: 'var ZoooomJoystick = Zoooom.ZoooomJoystick; Zoooom = Zoooom.default;' },
+    esbuildOptions(options) {
+      options.footer = { js: 'var ZoooomJoystick = Zoooom.ZoooomJoystick; Zoooom = Zoooom.default || Zoooom;' };
+    },
   },
 ]);
