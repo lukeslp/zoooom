@@ -10,7 +10,7 @@ Zero-dependency pan/zoom image viewer. 25KB.
 
 I built this because I wanted to host high-resolution images without compression destroying them, and couldn't find a viewer that zoomed toward the cursor instead of the center.
 
-**[Live demo](https://dr.eamer.dev/viewer/static/02COlIZ.html)**
+**[Interactive demo](https://dr.eamer.dev/downloads/zoooom/)** · **[Gallery (165 images)](https://dr.eamer.dev/viewer/)**
 
 ```bash
 npm install zoooom
