@@ -73,8 +73,8 @@ export function loadImage(
   const preloader = new Image();
 
   preloader.onload = () => {
-    elements.image.src = preloader.src;
-
+    // Set handlers BEFORE setting src — if the image is cached,
+    // the browser may fire onload synchronously on src assignment.
     elements.image.onload = () => {
       removeLoadingOverlay(elements);
 
@@ -116,6 +116,8 @@ export function loadImage(
       emit('error', error);
       options.onError?.(error);
     };
+
+    elements.image.src = preloader.src;
   };
 
   preloader.onerror = () => {
