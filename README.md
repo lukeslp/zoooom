@@ -8,7 +8,7 @@
 
 Zero-dependency pan/zoom image viewer. 25KB.
 
-I built this because I wanted to host high-resolution images without compression destroying them, and couldn't find a viewer that zoomed toward the cursor instead of the center.
+I got tired of image hosts compressing everything and couldn't find a viewer that zoomed toward the cursor instead of the center. So I built one.
 
 **[Interactive demo](https://dr.eamer.dev/downloads/zoooom/)** · **[Gallery (165 images)](https://dr.eamer.dev/viewer/)**
 
@@ -23,18 +23,15 @@ new Zoooom('#container', { src: 'image.jpg' });
 
 ---
 
-## What Makes This Different
+## What's different
 
-Most image zoom libraries are either:
-1. jQuery plugins from 2014 that zoom to center (not cursor position)
-2. React/Vue wrappers that bring 200KB of framework along
-3. Overkill map engines that want tile servers
+Most zoom libraries either scale from center (wrong), require a framework, or are map engines in disguise.
 
-`zoooom` is none of those. It's the interaction engine extracted from an accessibility-first image viewer I built to display 165 high-resolution infographics. Battle-tested with mouse, touch, trackpad, keyboard, and even joystick input across Chrome, Firefox, Safari, and mobile.
+This one zooms toward your cursor. The coordinate math keeps the pixel under your pointer stationary at every scale change. Trackpad scrolling is detected separately from mouse wheel clicks and gets continuous exponential zoom instead of discrete steps. Pinch-to-zoom tracks the actual midpoint between your fingers, updated each frame. Safari gesture events are handled where available.
 
-**Zero dependencies. ~25KB core (before gzip). Works with any image.**
+Images render at native resolution regardless of container size. A calculated base scale fits them visually, so zooming in reveals actual source pixels instead of upscaling a constrained raster. This works in a 500px embed or a full-viewport viewer.
 
-The zoom-toward-cursor math is correct (not the naive "scale from center" that most libs do). Trackpad detection distinguishes precision scrolling from mouse wheel clicks. Safari gesture events are handled. Pinch-to-zoom tracks the actual pinch center, not the image center.
+**Zero dependencies. ~25KB. Works with a script tag.**
 
 ---
 
@@ -43,7 +40,7 @@ The zoom-toward-cursor math is correct (not the naive "scale from center" that m
 | Method | Action |
 |--------|--------|
 | Mouse drag | Pan |
-| Scroll wheel | Zoom toward cursor (discrete steps) |
+| Scroll wheel | Zoom toward cursor |
 | Trackpad | Continuous zoom toward cursor |
 | Ctrl+wheel | Pinch gesture (Windows/Linux) |
 | Safari gestures | Native gesture zoom |
@@ -71,9 +68,9 @@ viewer.reset()
 viewer.load(src, alt?)
 viewer.destroy()
 
-viewer.scale        // current zoom
-viewer.translateX   // current X
-viewer.translateY   // current Y
+viewer.scale        // current zoom (1 = fitted)
+viewer.translateX   // current X offset
+viewer.translateY   // current Y offset
 viewer.isLoaded
 
 viewer.on('load' | 'error' | 'zoom' | 'pan' | 'reset' | 'destroy', fn)
@@ -102,6 +99,8 @@ viewer.off(event, fn)
 | `onZoom` | — | |
 | `onPan` | — | |
 
+The container must have explicit dimensions (width and height). The library does not set these.
+
 ## Joystick Plugin
 
 ```js
@@ -117,7 +116,7 @@ Full bundle: `unpkg.com/zoooom/dist/zoooom-full.iife.global.js`
 - Full keyboard navigation
 - ARIA on all controls
 - 44px touch targets
-- Joystick announces direction + speed to screen readers
+- Joystick announces direction and speed to screen readers
 
 ## CSS Variables
 
@@ -132,6 +131,8 @@ Full bundle: `unpkg.com/zoooom/dist/zoooom-full.iife.global.js`
   --zoooom-cursor-active: grabbing;
 }
 ```
+
+Disable auto-injection with `injectStyles: false` and use `zoooom/css` for a standalone stylesheet.
 
 ## Script Tag
 
