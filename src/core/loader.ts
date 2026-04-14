@@ -1,5 +1,5 @@
 import type { ZoooomState, ZoooomElements, ZoooomResolvedOptions } from '../types.js';
-import { calculateMaxScale, centerImage } from './transform.js';
+import { calculateBaseScale, calculateMaxScale, centerImage } from './transform.js';
 
 /**
  * Create the loading overlay element (spinner + text).
@@ -99,9 +99,10 @@ export function loadImage(
         }, 50);
       }
 
-      // Calculate max scale from actual dimensions
+      // Calculate base scale (fit native image to container) and max zoom
+      state.baseScale = calculateBaseScale(elements);
       if (options.maxScale === 'auto') {
-        state.maxScale = calculateMaxScale(elements, options.overscaleFactor);
+        state.maxScale = calculateMaxScale(state, options.overscaleFactor);
       }
 
       centerImage(state, elements);

@@ -30,15 +30,9 @@ export const ZOOOOM_CSS = `
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(1);
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  object-position: center;
   user-select: none;
   -webkit-user-select: none;
   pointer-events: none;
-  image-rendering: high-quality;
-  -webkit-image-rendering: high-quality;
 }
 
 [data-zoooom] .zoooom-loading {

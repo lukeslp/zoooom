@@ -62,6 +62,7 @@ export interface ZoooomState {
   velocityX: number;
   velocityY: number;
   maxScale: number;
+  baseScale: number;
   isDragging: boolean;
   isAnimating: boolean;
   isLoaded: boolean;

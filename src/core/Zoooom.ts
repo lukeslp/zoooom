@@ -8,7 +8,7 @@ import type {
   InputCleanup,
 } from '../types.js';
 import { MIN_SCALE, ZOOM_FACTOR, OVERSCALE_FACTOR, VELOCITY_DAMPING, PAN_STEP, TRACKPAD_SENSITIVITY } from './constants.js';
-import { updateTransform, zoomTowardsPoint, resetView, centerImage, calculateMaxScale } from './transform.js';
+import { updateTransform, zoomTowardsPoint, resetView, centerImage } from './transform.js';
 import { loadImage } from './loader.js';
 import { attachMouse } from '../input/mouse.js';
 import { attachTouch } from '../input/touch.js';
@@ -94,6 +94,7 @@ export class Zoooom {
       velocityX: 0,
       velocityY: 0,
       maxScale: typeof this.options.maxScale === 'number' ? this.options.maxScale : 10,
+      baseScale: 1,
       isDragging: false,
       isAnimating: false,
       isLoaded: false,

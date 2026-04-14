@@ -1,14 +1,20 @@
 import { MIN_SCALE, OVERSCALE_FACTOR, VELOCITY_DAMPING } from './constants.js';
 import type { ZoooomState, ZoooomElements } from '../types.js';
 
+/** The actual CSS scale applied to the image: baseScale * userScale */
+function cssScale(state: ZoooomState): number {
+  return state.baseScale * state.scale;
+}
+
 /**
  * Apply the current transform state to the image element.
- * Uses translate(calc(-50% + Xpx), calc(-50% + Ypx)) scale(S) for center-anchored zoom.
+ * The image renders at native resolution; baseScale * scale fits/zooms it.
  */
 export function updateTransform(state: ZoooomState, elements: ZoooomElements): void {
   if (!elements.image) return;
+  const s = cssScale(state);
   elements.image.style.transform =
-    `translate(calc(-50% + ${state.translateX}px), calc(-50% + ${state.translateY}px)) scale(${state.scale})`;
+    `translate(calc(-50% + ${state.translateX}px), calc(-50% + ${state.translateY}px)) scale(${s})`;
 }
 
 /**
@@ -68,34 +74,43 @@ export function resetView(state: ZoooomState, elements: ZoooomElements): void {
 }
 
 /**
- * Calculate the maximum zoom scale from the image's natural vs displayed dimensions.
- * Allows zooming to full native resolution * overscale factor.
+ * Calculate the base scale that fits the native image into the container.
+ * Called once on image load.
+ */
+export function calculateBaseScale(elements: ZoooomElements): number {
+  if (!elements.image || !elements.container) return 1;
+
+  const natW = elements.image.naturalWidth;
+  const natH = elements.image.naturalHeight;
+  const conW = elements.container.clientWidth;
+  const conH = elements.container.clientHeight;
+
+  if (!natW || !natH || !conW || !conH) return 1;
+
+  return Math.min(conW / natW, conH / natH);
+}
+
+/**
+ * Calculate the maximum user-facing scale.
+ * scale=1 means fitted; maxScale lets you zoom to native resolution * overscale.
  */
 export function calculateMaxScale(
-  elements: ZoooomElements,
+  state: ZoooomState,
   overscaleFactor: number = OVERSCALE_FACTOR,
 ): number {
-  if (!elements.image) return 10;
+  if (!state.baseScale || state.baseScale <= 0) return 10;
 
-  const naturalWidth = elements.image.naturalWidth;
-  const naturalHeight = elements.image.naturalHeight;
-  const displayWidth = elements.image.clientWidth;
-  const displayHeight = elements.image.clientHeight;
-
-  if (!naturalWidth || !naturalHeight || !displayWidth || !displayHeight) return 10;
-
-  const widthRatio = naturalWidth / displayWidth;
-  const heightRatio = naturalHeight / displayHeight;
-  const maxScaleFactor = Math.max(widthRatio, heightRatio);
-
-  // Higher overscale on mobile for full-res zoom
+  // At scale=1, CSS scale = baseScale. Native pixels = 1/baseScale.
+  // Allow zooming to native res * overscale factor.
+  const nativeScale = 1 / state.baseScale;
   const mobileOverscale = window.innerWidth <= 768 ? overscaleFactor * 2 : overscaleFactor;
-  return Math.max(maxScaleFactor * mobileOverscale, MIN_SCALE);
+  return Math.max(nativeScale * mobileOverscale, 1);
 }
 
 /**
  * Zoom toward a specific point (cursor, pinch center, or container center).
  * Maintains the image point under the target coordinate.
+ * All coordinate math uses the actual CSS scale (baseScale * userScale).
  */
 export function zoomTowardsPoint(
   state: ZoooomState,
@@ -107,10 +122,13 @@ export function zoomTowardsPoint(
 ): void {
   if (!elements.container || !elements.image) return;
 
-  const currentScale = state.scale;
-  const newScale = Math.max(MIN_SCALE, Math.min(state.scale * delta, state.maxScale));
+  const currentUserScale = state.scale;
+  const newUserScale = Math.max(MIN_SCALE, Math.min(state.scale * delta, state.maxScale));
 
-  if (newScale === currentScale) return;
+  if (newUserScale === currentUserScale) return;
+
+  const currentCSS = state.baseScale * currentUserScale;
+  const newCSS = state.baseScale * newUserScale;
 
   const containerRect = elements.container.getBoundingClientRect();
   const containerCenterX = containerRect.width / 2;
@@ -119,20 +137,20 @@ export function zoomTowardsPoint(
   const targetX = pointX ?? containerCenterX;
   const targetY = pointY ?? containerCenterY;
 
-  // Calculate the image point under the target coordinate
-  const imageX = (targetX - containerCenterX - state.translateX) / currentScale;
-  const imageY = (targetY - containerCenterY - state.translateY) / currentScale;
+  // Calculate the image point under the target coordinate using actual CSS scale
+  const imageX = (targetX - containerCenterX - state.translateX) / currentCSS;
+  const imageY = (targetY - containerCenterY - state.translateY) / currentCSS;
 
-  // Update translation to keep that point stationary
-  state.translateX = targetX - containerCenterX - imageX * newScale;
-  state.translateY = targetY - containerCenterY - imageY * newScale;
+  // Update translation to keep that point stationary at the new scale
+  state.translateX = targetX - containerCenterX - imageX * newCSS;
+  state.translateY = targetY - containerCenterY - imageY * newCSS;
 
   // Smooth zoom transition (skipped for reduced motion)
   if (!state.reducedMotion) {
     elements.image.style.transition = 'transform 0.2s ease-out';
   }
 
-  state.scale = newScale;
+  state.scale = newUserScale;
   updateTransform(state, elements);
   onZoom?.(state.scale);
 

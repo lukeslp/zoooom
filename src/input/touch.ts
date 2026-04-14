@@ -1,5 +1,6 @@
 import { MIN_SCALE } from '../core/constants.js';
 import { calculateMaxScale, updateTransform } from '../core/transform.js';
+
 import type { ZoooomState, ZoooomElements, InputCleanup } from '../types.js';
 
 function getDistance(e: TouchEvent): number {
@@ -62,7 +63,7 @@ export function attachTouch(
       const currentDistance = getDistance(e);
       const scaleFactor = currentDistance / state.initialDistance;
       const targetScale = state.initialScale * scaleFactor;
-      state.maxScale = calculateMaxScale(elements, overscaleFactor);
+      state.maxScale = calculateMaxScale(state, overscaleFactor);
       const newScale = Math.max(MIN_SCALE, Math.min(targetScale, state.maxScale));
 
       if (newScale === state.scale) return;
@@ -78,11 +79,15 @@ export function attachTouch(
       const containerCenterX = rect.width / 2;
       const containerCenterY = rect.height / 2;
 
-      const imageX = (state.pinchCenter.x - containerCenterX - state.initialTranslateX) / state.initialScale;
-      const imageY = (state.pinchCenter.y - containerCenterY - state.initialTranslateY) / state.initialScale;
+      // Use actual CSS scale for coordinate math
+      const initialCSS = state.baseScale * state.initialScale;
+      const newCSS = state.baseScale * newScale;
 
-      state.translateX = currentPinchCenter.x - containerCenterX - imageX * newScale;
-      state.translateY = currentPinchCenter.y - containerCenterY - imageY * newScale;
+      const imageX = (state.pinchCenter.x - containerCenterX - state.initialTranslateX) / initialCSS;
+      const imageY = (state.pinchCenter.y - containerCenterY - state.initialTranslateY) / initialCSS;
+
+      state.translateX = currentPinchCenter.x - containerCenterX - imageX * newCSS;
+      state.translateY = currentPinchCenter.y - containerCenterY - imageY * newCSS;
 
       state.scale = newScale;
       updateTransform(state, elements);
